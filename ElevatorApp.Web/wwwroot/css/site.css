@@ -1,0 +1,22 @@
+.elevator-card {
+    transition: all 0.3s ease-in-out;
+    border: 1px solid #dee2e6;
+}
+
+.floor-display {
+    background-color: #f8f9fa;
+    border: 1px solid #ced4da;
+    border-radius: .25rem;
+    padding: 1rem;
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+
+.direction-arrow {
+    margin-right: 10px;
+}
+
+.request-queue ul {
+    max-height: 150px;
+    overflow-y: auto;
+}

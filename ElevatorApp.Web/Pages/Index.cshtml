@@ -1,0 +1,289 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Elevator Simulation";
+}
+
+<style>
+    /* Elevator cards */
+    .elevator-card {
+        min-height: 320px;
+        transition: box-shadow 0.2s ease;
+    }
+
+        .elevator-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+
+    .floor-display {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-size: 1.4rem;
+    }
+
+    .direction-arrow {
+        font-size: 1.3rem;
+    }
+
+    .request-queue {
+        max-height: 90px;
+        overflow: auto;
+    }
+
+    /* Global request form and log area */
+    .global-request-area {
+        margin-top: 1.5rem;
+    }
+
+    /* Request Log Theme */
+    .log-card {
+        max-height: 340px;
+        overflow: hidden;
+        border: 1px solid #dee2e6;
+        border-radius: 0.75rem;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .request-log-table {
+        width: 100%;
+        table-layout: fixed;
+        border-collapse: collapse;
+    }
+
+        .request-log-table thead {
+            position: sticky;
+            top: 0;
+            background: #f8f9fa;
+            z-index: 2;
+        }
+
+        .request-log-table th,
+        .request-log-table td {
+            padding: 0.5rem 0.75rem;
+            text-align: center;
+            font-size: 0.9rem;
+            border-bottom: 1px solid #e9ecef;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .request-log-table tbody tr:nth-child(even) {
+            background-color: #fdfdfd;
+        }
+
+        .request-log-table tbody tr:nth-child(odd) {
+            background-color: #fafafa;
+        }
+
+        .request-log-table tbody tr:hover {
+            background-color: #e9f5ff;
+            transition: background-color 0.2s ease;
+        }
+
+    .log-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .timestamp-small {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+
+    /* Highlight animation for newly added row */
+    @@keyframes flashHighlight {
+        0% {
+            background-color: #d4edda;
+        }
+
+        100% {
+            background-color: transparent;
+        }
+    }
+
+    .flash-new {
+        animation: flashHighlight 2.5s ease-out;
+    }
+
+    @@keyframes pulseHighlight {
+        0% {
+            box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.6);
+        }
+
+        70% {
+            box-shadow: 0 0 0 10px rgba(0, 123, 255, 0);
+        }
+
+        100% {
+            box-shadow: 0 0 0 0 rgba(0, 123, 255, 0);
+        }
+    }
+
+    .pulse-highlight {
+        animation: pulseHighlight 2s ease-out;
+    }
+
+    .floor-grid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(40px, 1fr));
+        gap: 6px;
+        user-select: none;
+    }
+
+    .floor-btn {
+        border: 1px solid #ced4da;
+        background: #fff;
+        padding: 6px 0;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        transition: background-color 0.15s ease, box-shadow 0.15s ease;
+        text-align: center;
+    }
+
+        .floor-btn:hover {
+            background-color: #f1f3f5;
+        }
+
+        .floor-btn.selected {
+            background-color: #0d6efd;
+            color: #fff;
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.15rem rgba(13,110,253,.25);
+        }
+
+    .current-choice {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-top: 4px;
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="text-center">
+        <h1 class="display-4">Elevator Control System</h1>
+        <p class="lead">A C#/.NET simulation with SignalR real-time updates.</p>
+        <button id="startSimButton" class="btn btn-primary btn-lg mb-4">Start Simulation</button>
+    </div>
+
+    <div id="elevator-grid" class="row">
+        @for (int i = 1; i <= 4; i++)
+        {
+            <div class="col-md-3">
+                <div class="card elevator-card" id="elevator-@i">
+                    <div class="card-header text-center">
+                        <img src="~/elevator-icon.png" alt="Elevator Icon" style="height: 30px; vertical-align: middle; margin-right: 8px;" />
+                        <span class="fw-bold">Elevator @i</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="text-center mb-3">
+                            <h5 class="card-title">Current Floor</h5>
+                            <div class="floor-display">
+                                <span class="direction-arrow">■</span>
+                                <span class="floor-number">1</span>
+                            </div>
+                        </div>
+
+                        <div class="request-queue mb-3">
+                            <h6>Request Queue</h6>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">No active requests</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- GLOBAL REQUEST FORM + LOG AREA -->
+    <div class="row global-request-area">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <div class="log-header">
+                        <h5 class="mb-0">New Elevator Request</h5>
+                        <small class="timestamp-small">Global request form — backend chooses optimal elevator.</small>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form id="globalRequestForm" class="request-input-form">
+                        <!-- FROM FLOOR (interactive grid) -->
+                        <div class="mb-3">
+                            <label class="form-label">From Floor</label>
+
+                            <!-- Hidden input retained so existing JS stays the same -->
+                            <input id="globalOrigin" type="hidden" required>
+
+                            <div class="floor-grid" data-target-input="globalOrigin" aria-label="Choose origin floor">
+                                @* Show floors 10..1 to mimic elevator panels top-to-bottom *@
+                                @for (int f = 10; f >= 1; f--)
+                                {
+                                    <button type="button" class="floor-btn" data-floor="@f">@f</button>
+                                }
+                            </div>
+                            <div class="current-choice">Selected: <span id="globalOriginDisplay">None</span></div>
+                        </div>
+
+                        <!-- TO FLOOR (interactive grid) -->
+                        <div class="mb-3">
+                            <label class="form-label">To Floor</label>
+
+                            <!-- Hidden input retained so existing JS stays the same -->
+                            <input id="globalDest" type="hidden" required>
+
+                            <div class="floor-grid" data-target-input="globalDest" aria-label="Choose destination floor">
+                                @for (int f = 10; f >= 1; f--)
+                                {
+                                    <button type="button" class="floor-btn" data-floor="@f">@f</button>
+                                }
+                            </div>
+                            <div class="current-choice">Selected: <span id="globalDestDisplay">None</span></div>
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100">Call Elevator</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- LOG -->
+        <div class="col-md-6">
+            <div class="card log-card">
+                <div class="card-header">
+                    <div class="log-header">
+                        <h5 class="mb-0">Request Log</h5>
+                        <small class="timestamp-small">Client-side log (UTC timestamp)</small>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div style="overflow:auto; max-height: 280px;">
+                        <table id="requestLogTable" class="request-log-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp (UTC)</th>
+                                    <th>From</th>
+                                    <th>To</th>
+                                    <th>Elevator #</th>
+                                    <th>Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- New entries injected by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/lib/microsoft/signalr/dist/browser/signalr.js"></script>
+    <script src="~/js/elevator.js"></script>
+}
