@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36623.8 d17.14
+VisualStudioVersion = 17.14.36623.8
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElevatorApp.Core", "ElevatorApp.Core\ElevatorApp.Core.csproj", "{2C0073A1-178D-4CB4-85E9-D66749CD4899}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElevatorApp.Web", "ElevatorApp.Web\ElevatorApp.Web.csproj", "{D371B39E-A68D-471E-98A9-617E945F7958}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElevatorApp.Tests", "ElevatorApp.Tests\ElevatorApp.Tests.csproj", "{EE404567-1BA9-4E75-BD00-744F4ACCD260}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{D371B39E-A68D-471E-98A9-617E945F7958}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D371B39E-A68D-471E-98A9-617E945F7958}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D371B39E-A68D-471E-98A9-617E945F7958}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EE404567-1BA9-4E75-BD00-744F4ACCD260}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE404567-1BA9-4E75-BD00-744F4ACCD260}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE404567-1BA9-4E75-BD00-744F4ACCD260}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE404567-1BA9-4E75-BD00-744F4ACCD260}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -7,14 +7,16 @@ public class ElevatorControlSystem
     public IReadOnlyList<Elevator> Elevators { get; }
     private readonly ConcurrentQueue<PassengerRequest> _unassignedRequests = new();
 
-    private const int MoveSeconds = Elevator.MoveTimeSeconds;
-    private const int StopSeconds = Elevator.StopTimeSeconds;
     private const int DirectionPenaltySeconds = 20; // penalty if elevator is going in the opposite direction
 
     public event Func<PassengerRequest, Elevator, Task>? ElevatorAssigned;
 
-    public ElevatorControlSystem(int elevatorCount)
+    private readonly IElevatorTimingConfig _config;
+
+    public ElevatorControlSystem(int elevatorCount, IElevatorTimingConfig? config = null)
     {
+        _config = config ?? new DefaultElevatorTimingConfig();
+
         var elevators = new List<Elevator>();
 
         for (int i = 1; i <= elevatorCount; i++)
@@ -98,7 +100,7 @@ public class ElevatorControlSystem
 
             var directionPenalty = (e.CurrentDirection != Direction.Idle && e.CurrentDirection != request.Direction) ? DirectionPenaltySeconds : 0;
 
-            var etaSeconds = floorsToOrigin * MoveSeconds + expectedStops * StopSeconds + directionPenalty;
+            var etaSeconds = floorsToOrigin * _config.MoveTimeSeconds + expectedStops * _config.StopTimeSeconds + directionPenalty;
 
             var tieBreaker = reqsSnapshot.Count;
 

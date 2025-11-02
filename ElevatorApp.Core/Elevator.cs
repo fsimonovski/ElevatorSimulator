@@ -4,9 +4,6 @@ namespace ElevatorApp.Core;
 
 public class Elevator
 {
-    public const int MoveTimeSeconds = 10;
-    public const int StopTimeSeconds = 10;
-
     public int Id { get; }
     public int CurrentFloor { get; private set; } = 1;
     public Direction CurrentDirection { get; private set; } = Direction.Idle;
@@ -19,9 +16,12 @@ public class Elevator
 
     public event Func<Elevator, Task>? StateChanged;
 
-    public Elevator(int id)
+    private readonly IElevatorTimingConfig _config;
+
+    public Elevator(int id, IElevatorTimingConfig? config = null)
     {
         Id = id;
+        _config = config ?? new DefaultElevatorTimingConfig();
     }
 
     public void AddRequest(PassengerRequest request)
@@ -46,7 +46,7 @@ public class Elevator
             {
                 OnStateChanged();
 
-                await Task.Delay(TimeSpan.FromSeconds(StopTimeSeconds));
+                await Task.Delay(TimeSpan.FromSeconds(_config.StopTimeSeconds));
             }
 
             // determine next destination based on current requests and direction
@@ -57,7 +57,7 @@ public class Elevator
             {
                 OnStateChanged();
 
-                await Task.Delay(TimeSpan.FromSeconds(MoveTimeSeconds));
+                await Task.Delay(TimeSpan.FromSeconds(_config.MoveTimeSeconds));
 
                 CurrentFloor += CurrentDirection == Direction.Up ? 1 : -1;
 
