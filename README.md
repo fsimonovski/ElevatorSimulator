@@ -58,5 +58,5 @@ Visit the application at:
 https://localhost:7076
 ```
 ### 4. Start the Simulation
-Click **“Start Simulation”** to trigger random elevator requests,  
+Click **“Start Simulation”** to start booking elevator requests,  
 or manually select floors and click **“Call Elevator”** to create your own.
