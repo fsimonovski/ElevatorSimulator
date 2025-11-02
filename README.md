@@ -61,7 +61,7 @@ flowchart TD
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/<your-username>/ElevatorApp.git
+git clone https://github.com/fsimonovski/ElevatorApp.git
 cd ElevatorApp
 ```
 
