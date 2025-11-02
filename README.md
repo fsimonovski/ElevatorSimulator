@@ -5,6 +5,10 @@ This project demonstrates core design principles — clean code, event-driven up
 
 ---
 
+<img width="1170" height="888" alt="ElevatorControlSystem" src="https://github.com/user-attachments/assets/0c604966-c598-446e-a462-11a38ce9a8f2" />
+
+---
+
 ## Overview
 
 This system simulates **4 elevators** operating in a **10-floor building**.  
