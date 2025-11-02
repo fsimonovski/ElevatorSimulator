@@ -22,19 +22,33 @@ Elevators handle random and user-generated requests, moving passengers between f
 ```mermaid
 flowchart TD
     subgraph UI[" Web UI (Razor + JS)"]
+        style UI fill:#2d2d2d,stroke:#444,stroke-width:2px
         A[User Request] -->|SignalR Hub Call| B(RequestElevator)
     end
 
     subgraph Backend[" ASP.NET Core Backend"]
-        B --> C{ElevatorControlSystem}
-        C -->|Assigns| D[Elevator 1..4]
-        D --> E[StateChanged Event]
-        C --> F((Simulation Service))
-        F -->|Tick Loop| D
-        E -->|Broadcast| G[SignalR Hub]
+        style Backend fill:#212121,stroke:#333,stroke-width:2px
+        C{ElevatorControlSystem}
+        style C fill:#263238,stroke:#607d8b,stroke-width:2px
+        D[Elevator 1..4]
+        style D fill:#37474f,stroke:#78909c,stroke-width:2px
+        E[StateChanged Event]
+        style E fill:#2e7d32,stroke:#388e3c,stroke-width:2px
+        F((Simulation Service))
+        style F fill:#6a1b9a,stroke:#ab47bc,stroke-width:2px
+        G[SignalR Hub]
+        style G fill:#f44336,stroke:#d32f2f,stroke-width:2px
     end
 
+    A -->|SignalR Hub Call| B(RequestElevator)
+    B --> C
+    C -->|Assigns| D
+    D --> E
+    C --> F
+    F -->|Tick Loop| D
+    E -->|Broadcast| G
     G -->|Push Update| UI
+
 ```
 
 ---
